@@ -38,3 +38,7 @@ ssh-copy-id -i ~/.ssh/id_rsa.pub <USER>@<IP>
 For this the user must already exist in the machine, and the machine running the command should also have ssh access. 
 
 > The first time that a connection to a new server is established, the ssh client will ask for confirmation. It is common to do this first connection manually to avoid "messing" with Ansible when it tries to connect. Alternatively, ansible can also be [configured to automatically accept](https://stackoverflow.com/questions/32297456/how-to-ignore-ansible-ssh-authenticity-checking)
+
+### Git
+
+In a normal production workflow, ansible scripts and playbooks are stored in a git repository. This allows to control and have a unified version of the scripts.
