@@ -1,2 +1,3 @@
 .server_pass
 ansible.key
+inventory*

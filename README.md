@@ -42,3 +42,70 @@ For this the user must already exist in the machine, and the machine running the
 ### Git
 
 In a normal production workflow, ansible scripts and playbooks are stored in a git repository. This allows to control and have a unified version of the scripts.
+
+
+## Getting Started
+
+### Installing Ansible
+
+Ansible can be installed from their direct repository, using `pip` or directy from many linux distribution package stores. 
+
+More info can be seen [here](https://docs.ansible.com/ansible-core/devel/installation_guide/installation_distros.html)
+
+To install in ubuntu:
+
+```bash
+sudo apt update
+sudo apt install software-properties-common
+sudo add-apt-repository --yes --update ppa:ansible/ansible
+sudo apt install ansible
+```
+
+### Inventory File
+
+To know which machines are available to control, ansible needs an inventory file. This file simply describes (with the ip addresses) which machines are to be controled
+
+The inventory files allow also to group and set up different configuration values for each server. They can be defined in `ini` or `yaml` formats (depending what is easier to read given the architecture)
+
+Even if no groups are defined in the inventory file, Ansible creates two default groups: `all` and `ungrouped`. The `all` group contains every host. The ungrouped group contains all hosts that don’t have another group aside from `all`. Threfore every host will always belong to at least 2 groups (`all` and `ungrouped` or `all` and some other group)
+
+Once the inventory is organized, commands can be run on all host in a group with:
+```bash
+ansible mygroup ...
+ansible all ...
+```
+
+More information can be found in the [documentation](https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html#how-to-build-your-inventory)
+
+
+
+### Running ad-hoc commands
+
+Although the core of ansible is using playbooks, the cli tool can be user to directly execute commands or run modules. 
+
+For running a command the following is needed:
+- Inventory group name 
+- Key to use when connecting via SSH
+- Inventory file location
+- Module or command
+
+This can all be passed in the cli. For example, the following command uses the `ping` [module](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/ping_module.html) to verify connection to all servers:
+
+```bash
+ansible all --key-file ansible.key -i inventory.ini -m ping
+```
+
+Most of the repetitive values however, can be put inside a `ansible.cfg` file. A local file will override configuration in `/etc/ansible/ansible.cfg`. [Configuration](https://docs.ansible.com/ansible/latest/reference_appendices/config.html) can also be done via environment variables:
+
+```cfg
+[defaults]
+inventory = inventory.ini
+private_key_file = ./ansible.key
+remote_user = ansible
+```
+
+That way, the following command (that uses the `gather_facts` module to get information of the servers) works:
+
+```bash
+ansible all -m gather_facts
+```
