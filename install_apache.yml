@@ -1,0 +1,9 @@
+---
+- name: Install apache # Nme of the whole playbook
+  hosts: all # Running on all nodes
+  become: true # Same as --become, run this as root
+  tasks:
+  - name: install apache2 package # Name of the task
+    apt: # Using the builtin apt module
+      name: apache2 # Name of the package to install
+      update_cache: true # Before installing run apt update

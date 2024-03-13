@@ -1,0 +1,10 @@
+---
+
+- name: Remove apache # Nme of the whole playbook
+  hosts: all # Running on all nodes
+  become: true # Same as --become, run this as root
+  tasks:
+  - name: remove apache2 package # Name of the task
+    apt: # Using the builtin apt module
+      name: apache2 # Name of the package to install
+      state: absent # Uninstall the package
