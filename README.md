@@ -81,7 +81,7 @@ More information can be found in the [documentation](https://docs.ansible.com/an
 
 ### Running ad-hoc commands
 
-Although the core of ansible is using playbooks, the cli tool can be user to directly execute commands or run modules. 
+Although the core of ansible is using playbooks, the cli tool can be user to directly execute commands or run modules. They work great for tasks that are run not that ofter.  
 
 For running a command the following is needed:
 - Inventory group name 
@@ -109,3 +109,21 @@ That way, the following command (that uses the `gather_facts` module to get info
 ```bash
 ansible all -m gather_facts
 ```
+
+#### Elevated commands
+
+Ansible uses existing privilege escalation systems to execute tasks with root privileges or with another user’s permissions. Because this feature allows you to ‘become’ another user, different from the user that logged into the machine (remote user), its called `become`. The `become` keyword uses existing privilege escalation tools like `sudo`, `su`, etc (using `sudo` by default)
+
+If nothing else is specified, the `become` keyword will try to run the commands as the `root` user. The password can be passed via a file (using the `--become-password-file` option) or be prompted (`-K` or `--ask-become-pass`). More information can be seen in the [docs](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_privilege_escalation.html)
+
+Example of ad-hoc elevated commands are:
+
+- Update package cache in all servers (`apt update`)
+    ```bash
+    ansible all -m apt -a update_cache=true --become --ask-become-pass
+    ```
+
+- Update and upgrade all packages (`apt upgrade`)
+    ```bash
+    ansible all -m apt -a upgrade=yes --become --ask-become-pass
+    ```
