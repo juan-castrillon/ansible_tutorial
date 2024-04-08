@@ -3,31 +3,20 @@
   hosts: all # Running on all nodes
   become: true # Same as --become, run this as root
   tasks:
-  - name: update repo index
-    apt:
-      update_cache: true # Before installing run apt update
-    when: ansible_distribution in ["Ubuntu", "Debian"]
-  - name: install apache2 package # Name of the task
+  - name: install apache2 package and php support # Name of the task
     apt: # Using the builtin apt module
-      name: apache2 # Name of the package to install
+      name: 
+        - apache2
+        - libapache2-mod-php
       state: latest
-    when: ansible_distribution in ["Ubuntu", "Debian"]
-  - name: Add php support
-    apt:
-      name: libapache2-mod-php
-      state: latest
-    when: ansible_distribution in ["Ubuntu", "Debian"]
-  - name: update repo index
-    dnf:
       update_cache: true # Before installing run apt update
-    when: ansible_distribution == "CentOS"
-  - name: install apache2 package # Name of the task
+    when: ansible_distribution in ["Ubuntu", "Debian"]
+
+  - name: install apache2 package
     dnf: # Using the builtin dnf module
-      name: httpd # Name of the package to install
+      name: 
+        - httpd 
+        - php
       state: latest
-    when: ansible_distribution == "CentOS"
-  - name: Add php support
-    dnf:
-      name: php
-      state: latest
+      update_cache: true
     when: ansible_distribution == "CentOS"
