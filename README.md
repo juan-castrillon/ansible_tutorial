@@ -166,3 +166,18 @@ This gives an overview of what the command achieved and wheter or not it succede
 - `changed` shows the tasks that actually changed something in the server (Running an install task twice will only change once)
 - `unreachable` will report if the server could not be reached while running the task
 - `skipped` will make sense for conditional tasks (that run depending if something is true)
+
+
+## Conditionally running
+
+Conditional logic can be introduced into Ansible playbooks using the `when` keyword. This allows to define a condition to execute a task. Any variable, including the ones resulted from `gather_facts` can be used for the condition. This means, that if a task should only run on Ubuntu servers, the task could look like this:
+
+```yaml
+  - name: install apache2 package # Name of the task
+    apt: # Using the builtin apt module
+      name: apache2 # Name of the package to install
+      update_cache: true # Before installing run apt update
+    when: ansible_distribution == "Ubuntu"
+```
+
+> `gather_facts` can be called as an ad-hoc task `ansible -m gather_facts` to see the different variables and values available
