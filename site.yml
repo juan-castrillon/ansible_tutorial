@@ -1,0 +1,49 @@
+---
+- name: Update packages
+  hosts: all # Running on all nodes
+  become: true 
+  tasks:
+  - name: install updates (deb)
+    apt:
+      upgrade: dist
+      update_cache: yes
+    when: ansible_distribution in ["Debian", "Ubuntu"]
+  - name: install updates (centos)
+    dnf:
+      update_only: yes
+      update_cache: yes
+    when: ansible_ditribution == "CentOS"
+
+- name: Provision web servers
+  hosts: web_servers
+  become: true
+  tasks:
+  - name: install apache2 package and php support (deb)
+    apt:
+      name: 
+        - apache2
+        - libapache2-mod-php
+      state: latest
+    when: ansible_distribution in ["Debian", "Ubuntu"]
+  - name: install apache2 package and php support (centos)
+    dnf:
+      name: 
+        - httpd
+        - php
+      state: latest
+    when: ansible_ditribution == "CentOS"
+
+- name: Provision dbs
+  hosts: db_servers
+  become: true
+  tasks:
+    - name: install mariadb (centos)
+      dnf:
+        name: mariadb
+        state: latest
+      when: ansible_distribution == "CentOS"
+    - name: install mariadb (deb)
+      apt:
+        name: mariadb-server
+        state: latest
+      when: ansible_distribution in ["Debian", "Ubuntu"]

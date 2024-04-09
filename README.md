@@ -170,6 +170,8 @@ This gives an overview of what the command achieved and wheter or not it succede
 
 ## Conditionally running
 
+### `when` keyword
+
 Conditional logic can be introduced into Ansible playbooks using the `when` keyword. This allows to define a condition to execute a task. Any variable, including the ones resulted from `gather_facts` can be used for the condition. This means, that if a task should only run on Ubuntu servers, the task could look like this:
 
 ```yaml
@@ -181,6 +183,55 @@ Conditional logic can be introduced into Ansible playbooks using the `when` keyw
 ```
 
 > `gather_facts` can be called as an ad-hoc task `ansible -m gather_facts` to see the different variables and values available
+
+
+### `hosts` and groups
+
+Another way to conditionally execute a playbook is to group the servers (based on characteristics, function, etc) and then using the `hosts` entry in the plays to target the different groups
+
+```yaml
+---
+- name: Update packages
+  hosts: all # Running on all nodes
+  become: true 
+  tasks:
+  - name: install updates (centos)
+    dnf:
+      update_only: yes
+      update_cache: yes
+    when: ansible_ditribution == "CentOS"
+
+- name: Provision web servers
+  hosts: web_servers
+  become: true
+  tasks:
+  - name: install apache2 package and php support (centos)
+    dnf:
+      name: 
+        - httpd
+        - php
+      state: latest
+    when: ansible_ditribution == "CentOS"
+
+- name: Provision dbs
+  hosts: db_servers
+  become: true
+  tasks:
+    - name: install mariadb (centos)
+      dnf:
+        name: mariadb
+        state: latest
+```
+
+With an inventory that looks like
+
+```ini
+[web_servers]
+1.2.3.4
+
+[db_servers]
+5.6.7.8.9
+```
 
 ## Variables
 
