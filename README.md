@@ -181,3 +181,19 @@ Conditional logic can be introduced into Ansible playbooks using the `when` keyw
 ```
 
 > `gather_facts` can be called as an ad-hoc task `ansible -m gather_facts` to see the different variables and values available
+
+## Variables
+
+Referenced in the playbook as `{{ name }}` variables allow for consolidation of playbooks as well as flexibility. 
+
+Variables can be defined:
+ 
+- In the inventory file. Particular values per host or group can be defined and will be picked up
+
+```ini
+[mygroup]
+1.2.3.4 apache_package=apache2 
+
+[mygroup:vars]
+other_var=something
+```
