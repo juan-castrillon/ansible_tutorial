@@ -1,0 +1,19 @@
+---
+- name: Install apache # Nme of the whole playbook
+  hosts: all # Running on all nodes
+  become: true # Same as --become, run this as root
+  tasks:
+  - name: install apache2 package and php support # Name of the task
+    package: # Using the builtin generic package module
+      name: 
+        - {{ apache_package }} # Variables defined in inventory per host/ group
+        - {{ php_package }}
+      state: latest
+      update_cache: true # This works because package module passes the arguments to the detected manager module (apt, dnf, etc.)
+  - name: Send custom html page
+    copy:
+      src: default_site.html # files directory is assumed
+      dest: /var/www/html/index.html
+      owner: root
+      group: root
+      mode: 0644

@@ -285,3 +285,37 @@ Variables can be defined:
 [mygroup:vars]
 other_var=something
 ```
+
+
+## Common use cases and modules
+
+### Copying a file
+
+- For this the `copy` module can be used
+- For example:
+
+```yaml
+- name: Send custom html page
+    copy:
+      src: default_site.html # files directory is assumed
+      dest: /var/www/html/index.html
+      owner: root
+      group: root
+      mode: 0644
+```
+
+### Unzipping a file
+
+- `unarchive` module can be used
+- It supports downloading a file directly
+
+```yaml
+- name: Install terraform
+  unarchive: # Needs unzip installed
+    src: https://releases.hashicorp.com/terraform/0.12.28|terraform_0.12.28_linux_amd64.zip
+    dest: /usr/local/bin
+    remote_src: yes
+    mode: 0755
+    owner: root
+    group: root
+```
