@@ -233,6 +233,43 @@ With an inventory that looks like
 5.6.7.8.9
 ```
 
+### Tags
+
+To focus (or skip) certain tasks from the playbook explicitly, tags can be used. This metadata allows ansible to just run or skip certain tasks. This helps to target particular architecture, quickly debug changes, etc. 
+
+Tags are defined in the different tasks as a comma separated string
+
+```yaml
+- name: Update packages
+  tags: always
+  hosts: all # Running on all nodes
+  become: true 
+  tasks:
+  - name: install updates (centos)
+    dnf:
+      update_only: yes
+      update_cache: yes
+    when: ansible_ditribution == "CentOS"
+
+- name: Provision web servers
+  tags: web_servers,centos
+  hosts: web_servers
+  become: true
+  tasks:
+  - name: install apache2 package and php support (centos)
+    dnf:
+      name: 
+        - httpd
+        - php
+      state: latest
+    when: ansible_ditribution == "CentOS"
+```
+
+Using the cli, `ansible-playbook --list-tags playbook.yml` can be used to see available tags. At the same time `ansible-playbook --tags centos` can be used to run only tasks that have a tag, with the opposite being `ansible-playbook --skip-tags centos`
+
+The special keywords `always` and `never` can be used in the tags to guarantee that no matter which tags are passed, a task always (or never) runs
+
+
 ## Variables
 
 Referenced in the playbook as `{{ name }}` variables allow for consolidation of playbooks as well as flexibility. 
