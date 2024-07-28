@@ -319,3 +319,44 @@ other_var=something
     owner: root
     group: root
 ```
+
+### Change lines in config files
+- The `lineinfile` module allows to match a file and replace it in the target server
+- It needs to be tested before hand, as any typo can lead to duplicate lines in the file leading to misconfiguration
+
+```yaml
+- name: change e-mail address for admin
+     lineinfile:
+       path: /etc/httpd/conf/httpd.conf
+       regexp: '^ServerAdmin'
+       line: ServerAdmin somebody@somewhere.net
+     when: ansible_distribution == "CentOS"
+     register: httpd
+```
+
+### Manage Services
+
+- Services can be managed, started, restarted, enabled, etc. from ansible using the `service` module
+- This is a generic module that acts  acts as a proxy to the underlying service manager module (like `systemd`) so not all options are available (similar to `package` module and `apt` or `dnf`)
+
+```yaml
+- name: Start and enable httpd in a CentOS machine
+  service:
+    name: httpd
+    state: started
+    enabled: true
+
+- name: change e-mail address for admin
+  lineinfile:
+    path: /etc/httpd/conf/httpd.conf
+    regexp: '^ServerAdmin'
+    line: ServerAdmin somebody@somewhere.net
+  when: ansible_distribution == "CentOS"
+  register: httpd
+ 
+- name: restart httpd (CentOS) only if the config file was changed
+  service:
+    name: httpd
+    state: restarted
+  when: httpd.changed 
+```
