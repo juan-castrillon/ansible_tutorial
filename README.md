@@ -360,3 +360,32 @@ other_var=something
     state: restarted
   when: httpd.changed 
 ```
+
+### User management
+
+- Several modules in ansible allow admins to do user management on the servers like `builtin.user` or `posix.authorized_key`
+- A very common use case is to have a bootstrap playbook to provision a user which then ansible can use for other playbooks (by having passwordless sudo for example)
+
+```yaml
+- hosts: all
+  become: true
+  tasks:
+
+  - name: create simone user
+    user:
+      name: simone
+      groups: root
+    
+  - name: add ssh key for simone
+    authorized_key:
+      user: simone
+      key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAe7/ofWLNBq3+fRn3UmgAizdicLs9vcS4Oj8VSOD1S/ ansible"
+        
+  - name: add sudoers file for simone
+    copy:
+      content: 'simone ALL=(ALL) NOPASSWD: ALL'
+      dest: /etc/sudoers.d/simone
+      owner: root
+      group: root
+      mode: 0440
+```
