@@ -286,6 +286,9 @@ Variables can be defined:
 other_var=something
 ```
 
+- In playbooks themselves using `vars` block or  `vars_file` for external files
+
+- In a `host_vars` directory. In this standard directory, each file corresponds to a host (either IP or hostname) and ansible will pick up automatically the variables defined there for each host. Similarly a `group_vars` directory can be used where the name of the files are the name of the groups in the inventory. More info [here](https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html#organizing-host-and-group-variables)
 
 ## Roles
 
@@ -343,6 +346,60 @@ Most importantly, `import_roles` is dynamic, which alows to do things like have 
 
 - Roles can be downloaded and shared via ansible galaxy, which is  an online open-source, public repository of Ansible content
 - Community roles can be installed and then called from playbooks
+
+
+## Handlers
+
+- There is a "special" kind of tasks called handlers, which only run when triggered by changes in another tasks
+- This behavior substitutes the pattern of combining `register` with `when: var changed`. It allows for more flexibility and easier management when multiple tasks can trigger the same handler. 
+- In roles, there is a `handlers` directory to place them, but they can also be added to a playbook.
+- They are triggered by `notify` and their name, which **must** be static (more info [here](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_handlers.html#using-variables-with-handlers))
+- Multiple tasks can trigger a handler. Notifying the same handler multiple times will result in executing the handler only once regardless of how many tasks notify it.
+- In the same way, a task can have multiple `notify`. It is important to note here that handlers are executed in the order they are defined in the handlers section, not in the order listed in the notify statement.
+
+Example:
+
+```yaml
+tasks:
+- name: Template configuration file
+  ansible.builtin.template:
+    src: template.j2
+    dest: /etc/foo.conf
+  notify:
+    - Restart memcached
+
+handlers:
+  - name: Restart memcached
+    ansible.builtin.service:
+      name: memcached
+      state: restarted
+```
+
+## Templates
+
+Ansible templates are files used to dynamically generate configuration files or scripts. These templates are written using the Jinja2 templating language, which allows to include variables, loops, conditionals, and more.
+
+Templates are typically stored in the `templates` directory of your Ansible role or playbook, and they are processed by the `template` module in Ansible. When you use this module, you specify the source template file and the destination path on the target machine. During execution, Ansible replaces any variables and expressions in the template with their corresponding values.
+
+### Example of Using a Template in Ansible
+
+Here’s an example of a simple template file (`config.j2`):
+
+```jinja2
+server_name = {{ inventory_hostname }}
+port = {{ http_port }}
+```
+
+To deploy this template, use the following task in your playbook:
+
+```yaml
+- name: Deploy configuration file
+  template:
+    src: config.j2
+    dest: /etc/myapp/config.conf
+```
+
+This task would create a file `/etc/myapp/config.conf` on the target machine with the variables replaced by their actual values from the playbook or inventory.
 
 
 ## Common use cases and modules
